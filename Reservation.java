@@ -9,7 +9,7 @@ public class Reservation {
 	private int numOfDays;
 	private double totalCost;
 	private boolean cancelled;
-	//private Room room;
+	private Room room;
 	
 	public Reservation(int reservationID, String username, Date startDate, Date endDate, 
 			int numOdDays, double totalCost, boolean cancelled)	{
@@ -50,9 +50,15 @@ public class Reservation {
 		return cancelled;
 	}
 	
-	/*public String toString() {
-		
+	public Room getRoom() {
+		return room;
 	}
-	*/
+	
+	public String toString() {
+		return String.format("%s \n%s to %s \nTotal Cost: "
+				+ new SimpleDateFormat("MM/dd/yyyy").format(startDate),
+				  new SimpleDateFormat("MM/dd/yyyy").format(endDate),
+				  numOfDays + room.getCostsPerNight());
+	}
 
 }
