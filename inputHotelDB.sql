@@ -174,7 +174,7 @@ END;
 DELIMITER ;
 delimiter //
 CREATE TRIGGER InsertReservation
-BEFORE INSERT ON  reservation
+AFTER INSERT ON  reservation
 FOR EACH ROW
 BEGIN
 Delete From reservation 
