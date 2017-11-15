@@ -142,3 +142,34 @@ values('customer1', 'TestCustF', 'TestCustL', '2345', 21, 'F', 'Customer');
 insert into user(username, firstName, lastName, password, age, gender, userRole)
 values('roomattent1', 'RoomAttentF', 'RoomAttentL', '3456', 22, 'F', 'Room Attendant');
 
+DROP PROCEDURE IF EXISTS archiveAll;
+DELIMITER //
+CREATE PROCEDURE archiveAll (IN cutoffDate TIMESTAMP)
+BEGIN
+	START TRANSACTION;
+		
+		INSERT INTO reservationArchive(reservationId,roomId,customerName,startDate,endDate,totalNumOfDays,
+		                                totalCost,cancelled,updateOn)
+		SELECT reservationId,roomId,customerName,startDate,endDate,totalNumOfDays,totalCost,cancelled,updateOn
+		FROM reservation
+		WHERE DATE(updatedOn) <= cutoffDate;
+
+		INSERT INTO roomServiceArchive(taskId,username,task,completedBy,updateOn)
+		SELECT taskId,username,task,completedBy,updateOn
+		FROM roomservice
+		WHERE DATE(updatedOn) <= cutoffDate;
+
+		INSERT INTO complaintArchive(complaintId,customer,complaint,time,resolvedBy,solution,updateOn)
+		SELECT complaintId,customer,complaint,time,resolvedBy,solution,updateOn
+		FROM complaint
+		WHERE DATE(updatedOn) <= cutoffDate;
+
+		DELETE FROM RESERVATION WHERE DATE(updateOn) <= cutoffDate;
+		DELETE FROM ROOMSERVICE WHERE DATE(updateOn) <= cutoffDate;
+		DELETE FROM COMPLAINT WHERE DATE(updateOn) <= cutoffDate;
+        
+	COMMIT;
+END;
+//
+DELIMITER ;
+
