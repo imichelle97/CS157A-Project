@@ -172,6 +172,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+DROP TRIGGER IF EXISTS InsertRreservation;
 delimiter //
 CREATE TRIGGER InsertReservation
 AFTER INSERT ON  reservation
@@ -183,4 +184,17 @@ where new.reservationID = reservationID and exists (select * From reservation wh
  END;
 //
 delimiter ;
+DROP TRIGGER IF EXISTS InsertRreservation;
+delimiter //
+CREATE TRIGGER DeleteRoomService
+AFTER UPDATE ON reservation 
+FOR EACH ROW
+BEGIN
+IF NEW.cancelled = False  THEN
+DELETE FROM roomService
+where reservationID = NEW.reservationID;
+END IF;
+ END;
+//
+delimiter ; 
 
