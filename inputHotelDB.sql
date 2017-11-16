@@ -190,7 +190,7 @@ CREATE TRIGGER DeleteRoomService
 AFTER UPDATE ON reservation 
 FOR EACH ROW
 BEGIN
-IF NEW.cancelled = False  THEN
+IF NEW.cancelled = TRUE  THEN
 DELETE FROM roomService
 where reservationID = NEW.reservationID;
 END IF;
