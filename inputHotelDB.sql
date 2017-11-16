@@ -180,7 +180,7 @@ FOR EACH ROW
 BEGIN
 Delete From reservation 
 where new.reservationID = reservationID and exists (select * From reservation where  new.roomID = roomID and  
-((new.startDate > startDate and new.startDate< endDate ) or(new.endDate > startDate and new.endDate < endDate)));
+((new.startDate >= startDate and new.startDate<= endDate ) or(new.endDate >= startDate and new.endDate <= endDate)));
  END;
 //
 delimiter ;
