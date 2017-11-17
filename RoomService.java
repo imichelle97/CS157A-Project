@@ -43,4 +43,10 @@ public void setTask(String t){
 	task = t;
 }
 
+public String toString() {
+	return "Task ID: " + taskID + 
+		"\nCustomer ID: " + userName + 
+		"\nTask Description: " + task;
+}
+	
 }
