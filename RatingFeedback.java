@@ -26,4 +26,12 @@ public String getcustomer(){
 public int getrating(){
 	return rating;
 }
+	
+public String toString() {
+	String str = "Customer = " + customer + 
+		"Rating Given: " + rating;
+	
+	return str;
+}
+	
 }
