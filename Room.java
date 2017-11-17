@@ -37,5 +37,9 @@ public boolean equals(Object obj) {
     	return false;
     }
 }
+	
+public String toString() {
+	return roomType + "\n" + "$" + costsPerNight + "\night";
+}
 
 }
