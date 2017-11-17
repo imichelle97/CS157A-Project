@@ -1,6 +1,8 @@
 
 
 import java.util.Date;
+import java.text.SimpleDateFormat;
+
 public class Complaint {
 		
 private int complaintID;
@@ -35,6 +37,19 @@ public String getResolvedBy(){
 public String getSolution(){
 	return solution;
 }
+
+public String toString() {
+	String str = "Username: " + customer + 
+		"\nComplaint ID: " + complaintID + 
+		"\nFiled on: " + new SimpleDateFormat("MM/dd/yyyy").format(time) + 
+		"\nComplaint: " + complaint;
+	if(resolvedBy != null) {
+		str += "\nResolved By: " + resolvedBy + 
+			"\nSolution: " + solution;
+	}
+	return str;
+}
+
 	
 
 }
