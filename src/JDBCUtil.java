@@ -8,7 +8,7 @@ import java.sql.Connection;
 
 public class JDBCUtil {
 	
-	private static final String dbPropertiesFile = "db.properties";
+	private static final String dbPropertiesFile = "db.properties.txt";
 	private static Properties prop = new Properties();
 	private static FileInputStream filesys;
 	
