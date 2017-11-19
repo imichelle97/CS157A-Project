@@ -134,13 +134,13 @@ values (89, "Single Room"),(89, "Single Room"),(89, "Single Room"),
 (200, "Platinum Suite"),(200, "Platinum Suite"),(200, "Platinum Suite");
 
 insert into user(username, firstName, lastName, password, age, gender, userRole)
-values('admin1', 'TestAdminF', 'TestAdminL', '1234', 26, 'F', 'Manager');
+values('admin1', 'TestAdminF', 'TestAdminL', '123', 26, 'F', 'Manager');
 
 insert into user(username, firstName, lastName, password, age, gender, userRole)
 values('customer1', 'TestCustF', 'TestCustL', '2345', 21, 'F', 'Customer');
 
 insert into user(username, firstName, lastName, password, age, gender, userRole)
-values('roomattent1', 'RoomAttentF', 'RoomAttentL', '3456', 22, 'F', 'Room Attendant');
+values('roomattent1', 'RoomAttentF', 'RoomAttentL', '12345', 22, 'F', 'Room Attendant');
 
 DROP PROCEDURE IF EXISTS archiveAll;
 DELIMITER //

@@ -5,7 +5,7 @@ public class Account {
 	final private String username;
 	private String firstName;
 	private String lastName;
-	private String userRole;
+	private String userRole;// can only be Customer', 'Manager', 'Room Attendant'
 	private int age;
 	private String gender;
 	private ArrayList<Reservation> reservations;
