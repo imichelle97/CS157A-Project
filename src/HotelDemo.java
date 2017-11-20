@@ -75,13 +75,13 @@ public class HotelDemo {
 				System.out.println("[C]ustomer,[M]anager,[A]ttendant");
 				String userRole ="Customer";
 				String userR = input.nextLine();
-				if(userR.equals("M")){userRole = "Mananger";}
+				if(userR.equals("M")){userRole = "Manager";}
 				if(userR.equals("A")){userRole = "Room Attendant";}
 				String password ="";
-				if(userRole.equals("M")){password = "123";}
-				if(userRole.equals("A")){password = "12345";}
+				if(userR.equals("M")){password = "123";}
+				else if(userR.equals("A")){password = "12345";}
 				else{
-					System.out.println("password");
+					System.out.println("password:");
 					password = input.nextLine();
 				}
 				User newUser = new User(username, firstname, lastname, userRole, age, gender, password);
