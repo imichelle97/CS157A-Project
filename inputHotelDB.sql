@@ -145,7 +145,9 @@ values('roomattent1', 'RoomAttentF', 'RoomAttentL', '12345', 22, 'F', 'Room Atte
 DROP PROCEDURE IF EXISTS archiveAll;
 DELIMITER //
 CREATE PROCEDURE archiveAll (IN cutoffDate TIMESTAMP)
+COMMENT 'Stored Procedure to handle ARCHIVE'
 BEGIN
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
 	START TRANSACTION;
 		
 		INSERT INTO reservationArchive(reservationId,roomId,customerName,startDate,endDate,totalNumOfDays,
@@ -172,6 +174,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
 DROP TRIGGER IF EXISTS InsertRreservation;
 delimiter //
 CREATE TRIGGER InsertReservation
@@ -183,6 +186,7 @@ where new.reservationID = reservationID and exists (select * From reservation wh
 ((new.startDate >= startDate and new.startDate<= endDate ) or(new.endDate >= startDate and new.endDate <= endDate)));
  END;
 //
+
 delimiter ;
 DROP TRIGGER IF EXISTS InsertRreservation;
 delimiter //
