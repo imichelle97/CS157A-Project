@@ -12,17 +12,18 @@ public class Reservation {
 	private boolean cancelled;
 	private Room room;
 	
-	public Reservation(int reservationID, String username, Date startDate, Date endDate, 
-			int numOdDays, double totalCost, boolean cancelled)	{
+	public Reservation(int reservationID, String username, Room room, Date startDate, Date endDate, 
+			int numOfDays, double totalCost, boolean cancelled)	{
 		this.reservationID = reservationID;
 		this.username = username;
+		this.room = room;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.numOfDays = numOfDays;
 		this.totalCost = totalCost;
 		this.cancelled = cancelled;
 	}
-	
+		
 	public int getReservationID() {
 		return reservationID;
 	}
