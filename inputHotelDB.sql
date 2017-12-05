@@ -175,17 +175,22 @@ END;
 //
 DELIMITER ;
 DROP TRIGGER IF EXISTS InsertRreservation;
-delimiter //
-CREATE TRIGGER InsertReservation
-AFTER INSERT ON  reservation
-FOR EACH ROW
+DELIMITER //
+Create trigger InsertRreservation
+Before Insert on Reservation
+For each row 
 BEGIN
-Delete From reservation 
-where new.reservationID = reservationID and exists (select * From reservation where  new.roomID = roomID and  
-((new.startDate >= startDate and new.startDate<= endDate ) or(new.endDate >= startDate and new.endDate <= endDate)));
- END;
-//
-delimiter ;
+	IF EXISTS (Select startDate, endDate 
+		From Reservation 
+		Where (new.startDate <= endDate AND new.startDate >= startDate and new.roomID = roomID) OR 
+		(new.endDate  >= startDate AND new.endDate <= endDate AND new.roomID = roomID))
+        THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'Date insert conflicts with another date';
+END IF;
+END; //
+DELIMITER ;
+
 DROP TRIGGER IF EXISTS DeleteRoomService;
 delimiter //
 CREATE TRIGGER DeleteRoomService
