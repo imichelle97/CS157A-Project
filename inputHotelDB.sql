@@ -22,9 +22,10 @@ CREATE TABLE room (
 	PRIMARY KEY(roomID)
 );
 
+
 DROP TABLE IF EXISTS reservation;
 CREATE TABLE reservation (
-	reservationID INT(10) NOT NULL AUTO_INCREMENT,
+	reservationID INT AUTO_INCREMENT,
 	roomID INT(10) NOT NULL,
 	customerName VARCHAR(20) NOT NULL,
 	startDate DATE NOT NULL,
@@ -32,11 +33,12 @@ CREATE TABLE reservation (
 	totalNumOfDays INT(10),
 	totalCost DOUBLE(10,2),
 	cancelled BOOLEAN NOT NULL DEFAULT FALSE,
-	updateOn TIMESTAMP NOT NULL DEFAULT current_timestamp ON UPDATE current_timestamp,
+	updateOn TIMESTAMP  DEFAULT current_timestamp ON UPDATE current_timestamp,
 	PRIMARY KEY(reservationID),
 	FOREIGN KEY(roomID) references room(roomID),
 	FOREIGN KEY(customerName) references user(username)
 );
+ALTER table reservation auto_increment = 1000;
 
 DROP TABLE IF EXISTS roomService;
 CREATE TABLE roomService (
@@ -85,7 +87,7 @@ CREATE TABLE reservationArchive (
 	totalNumOfDays INT(10),
 	totalCost DOUBLE(10,2),
 	cancelled BOOLEAN NOT NULL DEFAULT FALSE,
-	updateOn TIMESTAMP NOT NULL DEFAULT current_timestamp ON UPDATE current_timestamp,
+	updateOn TIMESTAMP DEFAULT current_timestamp ON UPDATE current_timestamp,
 	PRIMARY KEY(reservationID),
 	FOREIGN KEY(roomID) references room(roomID),
 	FOREIGN KEY(customerName) references user(username)
@@ -145,9 +147,7 @@ values('roomattent1', 'RoomAttentF', 'RoomAttentL', '12345', 22, 'F', 'Room Atte
 DROP PROCEDURE IF EXISTS archiveAll;
 DELIMITER //
 CREATE PROCEDURE archiveAll (IN cutoffDate TIMESTAMP)
-COMMENT 'Stored Procedure to handle ARCHIVE'
 BEGIN
-	DECLARE EXIT HANDLER FOR SQLEXCEPTION ROLLBACK;
 	START TRANSACTION;
 		
 		INSERT INTO reservationArchive(reservationId,roomId,customerName,startDate,endDate,totalNumOfDays,
@@ -174,7 +174,6 @@ BEGIN
 END;
 //
 DELIMITER ;
-
 DROP TRIGGER IF EXISTS InsertRreservation;
 delimiter //
 CREATE TRIGGER InsertReservation
@@ -186,9 +185,8 @@ where new.reservationID = reservationID and exists (select * From reservation wh
 ((new.startDate >= startDate and new.startDate<= endDate ) or(new.endDate >= startDate and new.endDate <= endDate)));
  END;
 //
-
 delimiter ;
-DROP TRIGGER IF EXISTS InsertRreservation;
+DROP TRIGGER IF EXISTS DeleteRoomService;
 delimiter //
 CREATE TRIGGER DeleteRoomService
 AFTER UPDATE ON reservation 

@@ -57,10 +57,13 @@ public class Reservation {
 	}
 	
 	public String toString() {
-		return String.format("%s \n%s to %s \nTotal Cost: "
+		/**return String.format("%s to %s Total Cost: "
 				+ new SimpleDateFormat("MM/dd/yyyy").format(startDate),
-				  new SimpleDateFormat("MM/dd/yyyy").format(endDate),
-				  numOfDays + room.getCostsPerNight());
+				  new SimpleDateFormat("MM/dd/yyyy").format(endDate)
+				  +numOfDays * room.getCostsPerNight());**/
+		String reservation = new SimpleDateFormat("MM/dd/yyyy").format(startDate) + "to" + new SimpleDateFormat("MM/dd/yyyy").format(endDate)+
+				"Total Cost:"+numOfDays * room.getCostsPerNight();
+		return reservation;
 	}
 
 }

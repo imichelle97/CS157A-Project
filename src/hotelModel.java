@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,15 +24,30 @@ public class hotelModel {
 	private Account currentUser;
 	private String currentRole;	//Either customer, manager, or attendant
 	private ArrayList<Reservation> reservations;
+	// JDBC driver name and database URL
+		 final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+		 final String DB_URL = "jdbc:mysql://localhost:3306/hotelDB?autoReconnect=true&useSSL=false";
+		// Database credentials
+			static final String USER = "root";
+			static final String PASS = "";
+			private static ResultSet resultSet = null;
+	//private Connection conn = JDBCUtil.getConnectionByDriverManager();
+		private Connection	conn ;
+	private Statement state;// = JDBCUtil.getStatement(conn);
 	
-	
-	private Connection conn = JDBCUtil.getConnectionByDriverManager();
-	private Statement state = JDBCUtil.getStatement(conn);
 	
 	/* 
 	 * Constructor
 	 */
 	public hotelModel() {
+		try {
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			state = conn.createStatement();
+			System.out.println("already connected to ");
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		TODAY.clear(Calendar.HOUR);	//The clear method sets calendar field(s) undefined
 		TODAY.clear(Calendar.MINUTE);
 		TODAY.clear(Calendar.SECOND);
@@ -73,22 +90,23 @@ public class hotelModel {
 	}
 	
 	public String sqlDate(String date) {
-		return "str_to_date('" + date + "', '%m/%d/%Y')";
+		return "str_to_date('" + date + "', '%m%d%Y')";
 	}
 	
 	/*
 	 * Add an account to the database
 	 */
-	public boolean addAccount(String username, String password, String firstName, String lastName, String userRole, int age, String gender) {
+	public boolean addAccount(String username, String password, String firstName, String lastName,
+			String userRole, int age, String gender) {
 		username = username.replace("'", "''");
 		password = password.replace("'", "''");
 		firstName = firstName.replace("'", "''");
 		lastName = lastName.replace("'", "''");
-		
 		String sql = String.format("INSERT INTO USER(username, password, firstName, lastName, userRole, age, gender" 
 				+ " VALUES('%s','%s','%s','%s','%s','%s''%s')",
 				username, password, firstName, lastName, userRole, age, gender);
 		try {
+
 			state.execute(sql);
 			return true;
 		}
@@ -123,18 +141,16 @@ public class hotelModel {
 	 */
 	public Account getUserAccount(String username) {
 		Account account = null;
-		String sqlAccount = "SELECT username, firstName, lastName, userRole, age, gender"
-				+ "FROM USER WHERE username = '" + username + "'";
+		String sqlAccount = "SELECT username, firstName, lastName, userRole, age, gender FROM USER where username = '"
+				+username+"'" ;
 		String sqlResult = "SELECT customerName, cancelled, reservationID, ROOM.roomID, "
-				+ "startDate, endDate, totalNumOfDays, totalCost, costPerNight, roomType" + 
-				"FROM ROOM right outer join RESERVATION" + 
-				"ON ROOM.roomID = RESERVATION.roomID" + 
-				"WHERE customer = '" + username + "'";
+				+ "startDate, endDate, totalNumOfDays, totalCost, costPerNight, roomType FROM ROOM right outer join RESERVATION ON ROOM.roomID = RESERVATION.roomID WHERE customerName = '"
+				+ username + "'";
 		try {
 			ResultSet rs = state.executeQuery(sqlAccount);
 			while(rs.next()) {
 				account = new Account(rs.getString("username"), rs.getString("firstName"),
-						rs.getString("lastName"), rs.getString("useRole"), rs.getInt("age"),
+						rs.getString("lastName"), rs.getString("userRole"), rs.getInt("age"),
 						rs.getString("gender"));
 			}
 			rs.close();
@@ -225,6 +241,7 @@ public class hotelModel {
 	
 	/*
 	 * Get specific reservation based on min and max of total cost range
+	 * tested, works 
 	 */
 	public ArrayList<Reservation> getReservations(String orderBy, Double min, Double max) {
 		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();

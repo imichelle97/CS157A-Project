@@ -21,81 +21,166 @@ public class HotelDemo {
 
 	public static void main(String[] args) {
 		User currentUser = null;
+	hotelModel model = new hotelModel();
+	
 		try {
 			HotelDemo.createDatabase();
 		Scanner input = new Scanner(System.in);
 		String option = "";
-		// Enter character in the [] as option 
-		while(!(option.equals("Q")))
-		{
-			System.out.println("[L]og IN,  [C]reate Account, [Q]uit");
-			option = input.nextLine();
-			switch (option) {
-			case "L":
-				System.out.print("userName: ");
-				String userName = input.nextLine();
-			     System.out.print("password: ");
-			     String passwords= input.nextLine();
-			     currentUser = logIn(userName, passwords);
-			     if(currentUser.getUsername().equals("")){
-			    	 System.out.println("wrong user name or password");
-			    	 break; }
-			     else{
-			    	 // for manager operation
-			    	 if(currentUser.getUserRole().equals("Manager")){
-			    		 System.out.println("[S]how all customers, [M]anage Accounts");
-			    		 String managerOption = input.nextLine();
-                     if(managerOption.equals("S")){
-                    	 showAllCustomer(); }	 
-			    	 // not finish
-                     else if(managerOption.equals("M")){
-			    		 
-			    	 }
-			    	 else{System.out.println("WRONG INPUT");}
-			     }
-			    	 // not finish
-			    	 if(currentUser.getUserRole().equals("Customer")){
-			    		 System.out.println("[M]ake a reservation, [V]iew Accounts,[C]omplaint");
-			    	 }
-			    	 // for attendant 
-			     }
-			     
-				break;
-			case "C":	
-				System.out.print("userName: ");
-				String username = input.nextLine();
-				System.out.println("FirstName");
-				String firstname = input.nextLine();
-				System.out.println("LastName");
-				String lastname = input.nextLine();
-				System.out.println("Age");
-				int age = Integer.valueOf(input.nextLine());
-				System.out.println("gender:");
-				String gender =input.nextLine();
-				System.out.println("[C]ustomer,[M]anager,[A]ttendant");
-				String userRole ="Customer";
-				String userR = input.nextLine();
-				if(userR.equals("M")){userRole = "Manager";}
-				if(userR.equals("A")){userRole = "Room Attendant";}
-				String password ="";
-				if(userR.equals("M")){password = "123";}
-				else if(userR.equals("A")){password = "12345";}
-				else{
-					System.out.println("password:");
-					password = input.nextLine();
-				}
-				User newUser = new User(username, firstname, lastname, userRole, age, gender, password);
-				if (addUser(newUser)) {
-					System.out.println("added succesfully");
-				} else {
-					System.out.println("username already exists");
-				}
-			case "Q":
-				break;
+		System.out.println("[L]og IN,  [C]reate Account, [Q]uit");
+		option = input.nextLine();
+		switch (option) {
+		case "L":
+			System.out.print("userName: ");
+			String userName = input.nextLine();
+		     System.out.print("password: ");
+		     String passwords= input.nextLine();
+		     currentUser = logIn(userName, passwords);
+		     if(currentUser.getUsername().equals("")){
+		    	 System.out.println("wrong user name or password");
+		    	 break; }
+		     
+		     else{
+		    	 // set correctly 
+		    	 model.setCurrentUser(currentUser.getUsername());
+		    	 ArrayList<Reservation> reservations=model.getAllReservations();
+		    	 for(Reservation r: reservations){
+		    	 System.out.println(r.toString()); }
+		    	 // for manager operation
+		    	 if(currentUser.getUserRole().equals("Manager")){
+		    		 model.setCurrentRole("Manager");
+		    		 System.out.println("[S]how all customers, [M]anage Accounts");
+		    		 String managerOption = input.nextLine();
+                 if(managerOption.equals("S")){
+                	 showAllCustomer();
+                	 }	 
+		    	 // not finish
+                 else if(managerOption.equals("M")){
+		    		 
+		    	 }
+		    	 else{System.out.println("WRONG INPUT");}
+		     }
+		    	 // not finish
+		    	 if(currentUser.getUserRole().equals("Customer")){
+		    		 model.setCurrentRole("Customer");
+		    		 model.getAllReservations();
+		    		 System.out.println("[S]how Avialable rooms, [V]iew Accounts,[C]omplaint,[R]eservation history");
+		    		 
+		    		 
+		    	 }
+		    	 // for attendant 
+		     }
+		     
+			break;
+		case "C":	
+			System.out.print("userName: ");
+			String username = input.nextLine();
+			System.out.println("FirstName");
+			String firstname = input.nextLine();
+			System.out.println("LastName");
+			String lastname = input.nextLine();
+			System.out.println("Age");
+			int age = Integer.valueOf(input.nextLine());
+			System.out.println("gender:");
+			String gender =input.nextLine();
+			System.out.println("[C]ustomer,[M]anager,[A]ttendant");
+			String userRole ="Customer";
+			String userR = input.nextLine();
+			if(userR.equals("M")){userRole = "Manager";}
+			if(userR.equals("A")){userRole = "Room Attendant";}
+			String password ="";
+			if(userR.equals("M")){password = "123";}
+			else if(userR.equals("A")){password = "12345";}
+			else{
+				System.out.println("password:");
+				password = input.nextLine();
 			}
-		}	
+			User newUser = new User(username, firstname, lastname, userRole, age, gender, password);
+			if (addUser(newUser)) {
+				System.out.println("added succesfully");
+			} else {
+				System.out.println("username already exists");
+			}
+		case "Q":
+			break;
+		
+		// Enter character in the [] as option 
+//		while(!(option.equals("Q")))
+//		{
+//			System.out.println("[L]og IN,  [C]reate Account, [Q]uit");
+//			option = input.nextLine();
+//			switch (option) {
+//			case "L":
+//				System.out.print("userName: ");
+//				String userName = input.nextLine();
+//			     System.out.print("password: ");
+//			     String passwords= input.nextLine();
+//			     currentUser = logIn(userName, passwords);
+//			     if(currentUser.getUsername().equals("")){
+//			    	 System.out.println("wrong user name or password");
+//			    	 break; }
+//			     
+//			     else{
+//			    	 model.setCurrentUser(currentUser.getUsername());
+//			    	 // for manager operation
+//			    	 if(currentUser.getUserRole().equals("Manager")){
+//			    		 model.setCurrentRole("Manager");
+//			    		 System.out.println("[S]how all customers, [M]anage Accounts");
+//			    		 String managerOption = input.nextLine();
+//                     if(managerOption.equals("S")){
+//                    	 showAllCustomer();
+//                    	 }	 
+//			    	 // not finish
+//                     else if(managerOption.equals("M")){
+//			    		 
+//			    	 }
+//			    	 else{System.out.println("WRONG INPUT");}
+//			     }
+//			    	 // not finish
+//			    	 if(currentUser.getUserRole().equals("Customer")){
+//			    		 System.out.println("[S]how Avialable rooms, [V]iew Accounts,[C]omplaint");
+//			    		 
+//			    		 
+//			    	 }
+//			    	 // for attendant 
+//			     }
+//			     
+//				break;
+//			case "C":	
+//				System.out.print("userName: ");
+//				String username = input.nextLine();
+//				System.out.println("FirstName");
+//				String firstname = input.nextLine();
+//				System.out.println("LastName");
+//				String lastname = input.nextLine();
+//				System.out.println("Age");
+//				int age = Integer.valueOf(input.nextLine());
+//				System.out.println("gender:");
+//				String gender =input.nextLine();
+//				System.out.println("[C]ustomer,[M]anager,[A]ttendant");
+//				String userRole ="Customer";
+//				String userR = input.nextLine();
+//				if(userR.equals("M")){userRole = "Manager";}
+//				if(userR.equals("A")){userRole = "Room Attendant";}
+//				String password ="";
+//				if(userR.equals("M")){password = "123";}
+//				else if(userR.equals("A")){password = "12345";}
+//				else{
+//					System.out.println("password:");
+//					password = input.nextLine();
+//				}
+//				User newUser = new User(username, firstname, lastname, userRole, age, gender, password);
+//				if (addUser(newUser)) {
+//					System.out.println("added succesfully");
+//				} else {
+//					System.out.println("username already exists");
+//				}
+//			case "Q":
+//				break;
+//			}
+//		}	
 			//User users = new User("customerT", "TestCustF", "TestCustL", "Customer", 21, "F", "2345");
-
+		}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
