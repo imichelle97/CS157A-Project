@@ -2,6 +2,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -27,11 +31,13 @@ public class hotelModel {
 	private Connection conn = JDBCUtil.getConnectionByDriverManager();
 	private Statement state = JDBCUtil.getStatement(conn);
 	
+	private ArrayList<ChangeListener> listeners;
+	
 	/* 
 	 * Constructor
 	 */
 	public hotelModel() {
-		TODAY.clear(Calendar.HOUR);	//The clear method sets calendar field(s) undefined
+		TODAY.clear(Calendar.HOUR);	
 		TODAY.clear(Calendar.MINUTE);
 		TODAY.clear(Calendar.SECOND);
 		TODAY.clear(Calendar.MILLISECOND);
@@ -43,6 +49,7 @@ public class hotelModel {
 	
 	public void setCurrentRole(String role) {
 		currentRole = role;
+		update();
 	}
 	
 	public String getCurrentRole() {
@@ -62,6 +69,7 @@ public class hotelModel {
 			currentUser = getUserAccount(username);
 			currentRole = currentUser.getUserRole();
 		}
+		update();
 	}
 	
 	public ArrayList<Reservation> getReservations() {
@@ -74,6 +82,17 @@ public class hotelModel {
 	
 	public String sqlDate(String date) {
 		return "str_to_date('" + date + "', '%m/%d/%Y')";
+	}
+	
+	public void addChangeListener(ChangeListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void update() {
+		ChangeEvent event = new ChangeEvent(this);
+		for(ChangeListener listener : listeners) {
+			listener.stateChanged(event);
+		}
 	}
 	
 	/*
@@ -188,6 +207,7 @@ public class hotelModel {
 			setCurrentUser(currentUser.getUsername());
 			ArrayList<Reservation> reservation = currentUser.getReservation();
 			reservations.add(reservation.get(reservation.size()-1));
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -269,6 +289,7 @@ public class hotelModel {
 		try {
 			state.execute(sql);
 			setCurrentUser(currentUser.getUsername());
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -512,6 +533,7 @@ public class hotelModel {
 				"' where complaint ID = " + id;
 		try {
 			state.execute(sql);
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -563,12 +585,13 @@ public class hotelModel {
 	/*
 	 * Resolve the task based on taskID
 	 */
-	public boolean resolveTask(int id) {
+	public boolean resolveTask(String string) {
 		String sql = "UPDATE roomService SET completedBy = '" 
 				+ currentUser.getUsername() + " WHERE taskID = "
-				+ id;
+				+ string;
 		try {
 			state.execute(sql);
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -585,6 +608,7 @@ public class hotelModel {
 				"WHERE customer = '" + username + "'";
 		try {
 			state.executeUpdate(sql);
+			update();
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
@@ -600,6 +624,7 @@ public class hotelModel {
 			CallableStatement call = conn.prepareCall("{call archiveAll(?)}");
 			call.setTimestamp("cutoffDate", ts);
 			call.execute();
+			update();
 			return true;
 		}
 		catch(SQLException e) {
