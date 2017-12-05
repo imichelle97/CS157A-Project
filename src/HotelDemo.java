@@ -1,4 +1,4 @@
-import java.nio.channels.SelectableChannel;
+/*import java.nio.channels.SelectableChannel;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -6,15 +6,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Scanner;*/
 
 public class HotelDemo {
+
+	public static void main(String[] args) {
+		hotelView view = new hotelView(new hotelModel());
+	}
+	
+}
+
+/*public class HotelDemo {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://localhost:3306/hotelDB?autoReconnect=true&useSSL=false";
 	// Database credentials
 	static final String USER = "root";
-	static final String PASS = "";
+	static final String PASS = "Sallybears3";
 	private static Connection conn = null;
 	private static PreparedStatement preparedStatement = null;
 	private static ResultSet resultSet = null;
@@ -75,13 +83,13 @@ public class HotelDemo {
 				System.out.println("[C]ustomer,[M]anager,[A]ttendant");
 				String userRole ="Customer";
 				String userR = input.nextLine();
-				if(userR.equals("M")){userRole = "Manager";}
+				if(userR.equals("M")){userRole = "Mananger";}
 				if(userR.equals("A")){userRole = "Room Attendant";}
 				String password ="";
-				if(userR.equals("M")){password = "123";}
-				else if(userR.equals("A")){password = "12345";}
+				if(userRole.equals("M")){password = "123";}
+				if(userRole.equals("A")){password = "12345";}
 				else{
-					System.out.println("password:");
+					System.out.println("password");
 					password = input.nextLine();
 				}
 				User newUser = new User(username, firstname, lastname, userRole, age, gender, password);
@@ -190,3 +198,4 @@ public class HotelDemo {
 		}
 	}
 }
+*/
