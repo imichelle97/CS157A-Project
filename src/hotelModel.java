@@ -1,11 +1,3 @@
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,7 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
 
+import java.util.GregorianCalendar;
+
+import javax.swing.event.ChangeListener;
 /*
  * This class is where the functional methods will be
  */
@@ -37,7 +35,7 @@ public class hotelModel {
 			private static ResultSet resultSet = null;
 	//private Connection conn = JDBCUtil.getConnectionByDriverManager();
 		private Connection	conn ;
-	private Statement state;// = JDBCUtil.getStatement(conn);
+	    private Statement state;// = JDBCUtil.getStatement(conn);
 	
 	
 	private ArrayList<ChangeListener> listeners;
@@ -67,7 +65,7 @@ public class hotelModel {
 	
 	public void setCurrentRole(String role) {
 		currentRole = role;
-		update();
+//		update();
 	}
 	
 	public String getCurrentRole() {
@@ -87,7 +85,7 @@ public class hotelModel {
 			currentUser = getUserAccount(username);
 			currentRole = currentUser.getUserRole();
 		}
-		update();
+//		update();
 	}
 	
 	public ArrayList<Reservation> getReservations() {
@@ -106,31 +104,52 @@ public class hotelModel {
 		listeners.add(listener);
 	}
 	
-	public void update() {
-		ChangeEvent event = new ChangeEvent(this);
-		for(ChangeListener listener : listeners) {
-			listener.stateChanged(event);
-		}
-	}
+//	public void update() {
+//		ChangeEvent event = new ChangeEvent(this);
+//		for(ChangeListener listener : listeners) {
+//			listener.stateChanged(event);
+//		}
+//	}
 	
 	/*
-	 * Add an account to the database
+	 * Add an account to the database  
+	 * changes to run 
 	 */
 	public boolean addAccount(String username, String password, String firstName, String lastName,
 			String userRole, int age, String gender) {
-		username = username.replace("'", "''");
-		password = password.replace("'", "''");
-		firstName = firstName.replace("'", "''");
-		lastName = lastName.replace("'", "''");
-		String sql = String.format("INSERT INTO USER(username, password, firstName, lastName, userRole, age, gender" 
-				+ " VALUES('%s','%s','%s','%s','%s','%s''%s')",
-				username, password, firstName, lastName, userRole, age, gender);
+//		username = username.replace("'", "''");
+//		password = password.replace("'", "''");
+//		firstName = firstName.replace("'", "''");
+//		lastName = lastName.replace("'", "''");
+//		String sql = String.format("INSERT INTO USER(username, password, firstName, lastName, userRole, age, gender" 
+//				+ " VALUES('%s','%s','%s','%s','%s','%s''%s')",
+//				username, password, firstName, lastName, userRole, age, gender);
+//		try {
+//
+//			state.execute(sql);
+//			return true;
+//		}
+//		catch(SQLException e) {
+//			e.printStackTrace();
+//			return false;
+//		}
+		String insertion = "INSERT INTO user(username, firstName, lastName, password, age, gender, userRole) VALUES(?,?,?,?,?,?,?)";
+		PreparedStatement preparedStatement;
 		try {
-
-			state.execute(sql);
-			return true;
-		}
-		catch(SQLException e) {
+			preparedStatement = conn.prepareStatement(insertion);
+		
+		preparedStatement.setString(1, username);
+		preparedStatement.setString(2, firstName);
+		preparedStatement.setString(3, lastName);
+		preparedStatement.setString(4, password);
+		preparedStatement.setInt(5, age);
+		preparedStatement.setString(6, gender);
+		preparedStatement.setString(7, userRole);
+		preparedStatement.addBatch();
+		System.out.println("After processing a batch of user");
+		preparedStatement.executeBatch();
+		return true;} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -138,6 +157,7 @@ public class hotelModel {
 	
 	/*
 	 * Get account information
+	 * running correctly
 	 */
 	public User getAccountInfo(String username) {
 		User user = null;
@@ -158,6 +178,7 @@ public class hotelModel {
 	
 	/*
 	 * Get user's account
+	 * running correctly
 	 */
 	public Account getUserAccount(String username) {
 		Account account = null;
@@ -194,14 +215,15 @@ public class hotelModel {
 	
 	/*
 	 * Change the user's account information/update the account information
+	 * running correctly 
 	 */
 	public boolean changeAccount(String password, String firstName, String lastName, int age, String gender) {
-		String sql = "UPDATE USER SET password = '" + password + "'"
-				+ " firstName = '" + firstName + "'"
-				+ " lastName = '" + lastName + "'"
-				+ " age = '" + age + "'" 
-				+ " gender = '" + gender + "'"
-				+ " WHERE username = '" + currentUser.getUsername() + "'";
+		String sql = "UPDATE USER SET password = '" + password + "' ," 
+	+ " firstName = '" + firstName 
+	+ "' ,"+ " lastName = '" 
+	+ lastName + "' ,"
+	+" age = " + age +","
+	+ " gender = '" + gender + "'"+ " WHERE username = '" + currentUser.getUsername() + "'";
 		try {
 			state.executeUpdate(sql);
 			return true;
@@ -214,17 +236,27 @@ public class hotelModel {
 	
 	/*
 	 * Add reservations to the database
+	 * input should in "yyyy-mm-dd" format
+	 * running correctly
 	 */
 	public boolean addReservation(int roomID, String checkIn, String checkOut) {
-		String sql = String.format("INSERT INTO RESERVATION(roomID, customer, startDate, endDate) "
-				+ "VALUES('%s','%s','%s','%s')", roomID, currentUser.getUsername(), sqlDate(checkIn),
-				sqlDate(checkOut));
+//		String sql = String.format("INSERT INTO RESERVATION(roomID, customer, startDate, endDate) "
+//				+ "VALUES('%s','%s','%s','%s')", roomID, currentUser.getUsername(), sqlDate(checkIn),
+//				sqlDate(checkOut));
+	String insertion = "INSERT INTO reservation(roomID, customerName, startDate, endDate) VALUES(?,?,?,?)";
 		try {
-			state.execute(sql);
-			setCurrentUser(currentUser.getUsername());
-			ArrayList<Reservation> reservation = currentUser.getReservation();
-			reservations.add(reservation.get(reservation.size()-1));
-			update();
+			PreparedStatement preparedStatement= conn.prepareStatement(insertion);
+			preparedStatement.setInt(1, roomID);
+			preparedStatement.setString(2, currentUser.getUsername());
+			preparedStatement.setDate(3, java.sql.Date.valueOf(checkIn));
+			preparedStatement.setDate(4, java.sql.Date.valueOf(checkOut));
+			preparedStatement.addBatch();
+			preparedStatement.executeBatch();
+//			state.execute(sql);
+//			setCurrentUser(currentUser.getUsername());
+//			ArrayList<Reservation> reservation = currentUser.getReservation();
+//			reservations.add(reservation.get(reservation.size()-1));
+//			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -235,6 +267,7 @@ public class hotelModel {
 	
 	/*
 	 * Get all reservations in the database
+	 * running correctly
 	 */
 	public ArrayList<Reservation> getAllReservations() {
 		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
@@ -262,7 +295,7 @@ public class hotelModel {
 	
 	/*
 	 * Get specific reservation based on min and max of total cost range
-	 * tested, works 
+	 * running correctly
 	 */
 	public ArrayList<Reservation> getReservations(String orderBy, Double min, Double max) {
 		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
@@ -303,11 +336,11 @@ public class hotelModel {
 	 * Cancel the reservation
 	 */
 	public boolean cancelReservation(Reservation r) {
-		String sql = "UPDATE RESERCATION SET cancelled = true WHERE reservation ID = " + r.getReservationID();
+		String sql = "UPDATE reservation SET cancelled = true WHERE reservationID = " + r.getReservationID();
 		try {
 			state.execute(sql);
 			setCurrentUser(currentUser.getUsername());
-			update();
+//			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -551,7 +584,7 @@ public class hotelModel {
 				"' where complaint ID = " + id;
 		try {
 			state.execute(sql);
-			update();
+//			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -609,7 +642,7 @@ public class hotelModel {
 				+ string;
 		try {
 			state.execute(sql);
-			update();
+//			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -626,7 +659,7 @@ public class hotelModel {
 				"WHERE customer = '" + username + "'";
 		try {
 			state.executeUpdate(sql);
-			update();
+//			update();
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
@@ -642,7 +675,7 @@ public class hotelModel {
 			CallableStatement call = conn.prepareCall("{call archiveAll(?)}");
 			call.setTimestamp("cutoffDate", ts);
 			call.execute();
-			update();
+//			update();
 			return true;
 		}
 		catch(SQLException e) {
