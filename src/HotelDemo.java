@@ -1,4 +1,4 @@
-import java.nio.channels.SelectableChannel;
+/*import java.nio.channels.SelectableChannel;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -6,15 +6,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Scanner;*/
 
 public class HotelDemo {
+
+	public static void main(String[] args) {
+		hotelView view = new hotelView(new hotelModel());
+	}
+	
+}
+
+/*public class HotelDemo {
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
 	static final String DB_URL = "jdbc:mysql://localhost:3306/hotelDB?autoReconnect=true&useSSL=false";
 	// Database credentials
 	static final String USER = "root";
-	static final String PASS = "";
+	static final String PASS = "Sallybears3";
 	private static Connection conn = null;
 	private static PreparedStatement preparedStatement = null;
 	private static ResultSet resultSet = null;
@@ -27,6 +35,7 @@ public class HotelDemo {
 			HotelDemo.createDatabase();
 		Scanner input = new Scanner(System.in);
 		String option = "";
+<<<<<<< HEAD
 		System.out.println("[L]og IN,  [C]reate Account, [Q]uit");
 		option = input.nextLine();
 		switch (option) {
@@ -100,6 +109,75 @@ public class HotelDemo {
 				System.out.println("added succesfully");
 			} else {
 				System.out.println("username already exists");
+=======
+		// Enter character in the [] as option 
+		while(!(option.equals("Q")))
+		{
+			System.out.println("[L]og IN,  [C]reate Account, [Q]uit");
+			option = input.nextLine();
+			switch (option) {
+			case "L":
+				System.out.print("userName: ");
+				String userName = input.nextLine();
+			     System.out.print("password: ");
+			     String passwords= input.nextLine();
+			     currentUser = logIn(userName, passwords);
+			     if(currentUser.getUsername().equals("")){
+			    	 System.out.println("wrong user name or password");
+			    	 break; }
+			     else{
+			    	 // for manager operation
+			    	 if(currentUser.getUserRole().equals("Manager")){
+			    		 System.out.println("[S]how all customers, [M]anage Accounts");
+			    		 String managerOption = input.nextLine();
+                     if(managerOption.equals("S")){
+                    	 showAllCustomer(); }	 
+			    	 // not finish
+                     else if(managerOption.equals("M")){
+			    		 
+			    	 }
+			    	 else{System.out.println("WRONG INPUT");}
+			     }
+			    	 // not finish
+			    	 if(currentUser.getUserRole().equals("Customer")){
+			    		 System.out.println("[M]ake a reservation, [V]iew Accounts,[C]omplaint");
+			    	 }
+			    	 // for attendant 
+			     }
+			     
+				break;
+			case "C":	
+				System.out.print("userName: ");
+				String username = input.nextLine();
+				System.out.println("FirstName");
+				String firstname = input.nextLine();
+				System.out.println("LastName");
+				String lastname = input.nextLine();
+				System.out.println("Age");
+				int age = Integer.valueOf(input.nextLine());
+				System.out.println("gender:");
+				String gender =input.nextLine();
+				System.out.println("[C]ustomer,[M]anager,[A]ttendant");
+				String userRole ="Customer";
+				String userR = input.nextLine();
+				if(userR.equals("M")){userRole = "Mananger";}
+				if(userR.equals("A")){userRole = "Room Attendant";}
+				String password ="";
+				if(userRole.equals("M")){password = "123";}
+				if(userRole.equals("A")){password = "12345";}
+				else{
+					System.out.println("password");
+					password = input.nextLine();
+				}
+				User newUser = new User(username, firstname, lastname, userRole, age, gender, password);
+				if (addUser(newUser)) {
+					System.out.println("added succesfully");
+				} else {
+					System.out.println("username already exists");
+				}
+			case "Q":
+				break;
+>>>>>>> origin/master
 			}
 		case "Q":
 			break;
@@ -275,3 +353,4 @@ public class HotelDemo {
 		}
 	}
 }
+*/
