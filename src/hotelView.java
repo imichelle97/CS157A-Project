@@ -82,7 +82,7 @@ public class hotelView {
 		pane.add(getViewRoomServicePanel(), "View Room Service");
 
 		frame.add(pane); // add the panel with card layout to the frame
-		frame.setSize(400, 300);
+		frame.setSize(500, 500);
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -419,7 +419,7 @@ public class hotelView {
 
 				if (validEntry) {
 					panel.clearComponents();
-					if (model.addAccount(login, pass, first, last, gen, age, type)){
+					if (model.addAccount(login, pass, first, last, type, age, gen)){
 						ArrayList<Account> users = model.getAllUsers(null);
 						allUsers.setListData(users.toArray());
 						view.switchPanel("Users");
@@ -518,7 +518,8 @@ public class hotelView {
 		
 		grid.insets = new Insets(5,15,5,15);
 		panel.addLabel("Password", 20, "center", null, null, 0, 3);
-		final JTextField passwordField = new JTextField();
+		//final JTextField passwordField = new JTextField();
+		final JPasswordField passwordField = new JPasswordField();
 		passwordField.setMargin(new Insets(5,5,5,5));
 		panel.addComponent(passwordField, 1, 3);
 		
@@ -528,7 +529,7 @@ public class hotelView {
 		loginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String username = usernameField.getText();
-				String password = new String(((JPasswordField) passwordField).getPassword());
+				String password = new String( passwordField.getPassword());
 				if (username.length() > 12) {
 					JOptionPane.showMessageDialog(new JFrame(),
 							"Error: Entered user username is invalid.", "Error",
@@ -685,7 +686,7 @@ public class hotelView {
 				}
 				catch (Exception e) {
 					validEntry = false;
-					errors += "Age must be selected<br>";
+					errors += "Age must be selected";
 				}
 
 				String gen = (String)genderBox.getSelectedItem();
@@ -698,9 +699,9 @@ public class hotelView {
 					errors += "Gender must be selected<br>";
 				}
 
-				if (validEntry) {
+				if(validEntry) {
 					panel.clearComponents();
-					if (model.addAccount(login, pass, first, last, gen, age, "Customer")){
+					if (model.addAccount(login, pass, first, last, "Customer", age, gen)){
 						model.setCurrentUser(login);
 						view.switchPanel(model.getCurrentRole());
 					}
@@ -717,51 +718,6 @@ public class hotelView {
 		return panel;
 	}
 
-	private JPanel getForgotPasswordPanel() {
-		final BasicMenuPanel panel = new BasicMenuPanel(this);
-		GridBagConstraints grid = panel.getConstraints();
-		grid.gridwidth = 2;
-		panel.addLabel("Retrieve Password", 24, "center", Color.white, Color.black, 0, 0);
-
-		grid.insets = new Insets(20, 20, 20, 20);
-		grid.ipady = 25;
-		grid.weighty = 1;
-		grid.gridwidth = 1;
-		
-		panel.addLabel("Enter your username:", 16, "left", null, null, 0, 2);
-
-		final JTextField userField = new JTextField();
-		panel.addComponent(userField, 1, 2);
-		panel.addNavigation("Back", 16, "Login", 1, 5);
-
-		JButton submitButton = new JButton("Enter");
-		submitButton.setFont(new Font("Tahoma", Font.BOLD, 16));
-		submitButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				boolean isValid = true;
-				String error = "";
-				String username = userField.getText();
-				if(username.isEmpty()) {
-					userField.setText("");
-					isValid = false;
-					error = "Username cannont be empty.";
-				}
-				else if(username.length() > 12) {
-					userField.setText("");
-					isValid = false;
-					error = "Username cannont exceed 12 characters."; 
-				}
-				else if(!model.checkUser(username)) {
-					userField.setText("");
-					isValid = false;
-					error = "Username does not exists in the system."; 
-				}
-			}				
-		});
-		panel.addComponent(submitButton, 0, 5);
-		return panel;
-	}
-
 	private JPanel getWelcomePanel(String role) {
 		final BasicMenuPanel panel = new BasicMenuPanel(this);
 		GridBagConstraints grid = panel.getConstraints();
@@ -773,7 +729,7 @@ public class hotelView {
 			public void stateChanged(ChangeEvent event) {
 				if (model.getCurrentUser() != null) {
 					Account user = model.getCurrentUser();
-					profile.setText("<html>Username: " + user.getUsername() 
+					profile.setText("Username: " + user.getUsername() 
 					+ "Name: " + user.getFirstName() + " " + user.getLastName()
 					+ "Role: " + user.getUserRole());
 				}
@@ -1175,7 +1131,7 @@ public class hotelView {
 				if (!maxTF.getText().equals(""))
 					max = Double.parseDouble(maxTF.getText());
 
-				ArrayList<Reservation> res = model.getReservations("customer", min, max);
+				ArrayList<Reservation> res = model.getReservations("customerName", min, max);
 				if (res != null)
 					list.setText(formatReservations(res));
 				else
@@ -1540,7 +1496,7 @@ public class hotelView {
 					if (response == JOptionPane.NO_OPTION) ;
 					if (response == JOptionPane.YES_OPTION) {
 						RoomService rs = (RoomService)list.getSelectedValue();
-						if (!model.resolveTask(rs.getTask()))
+						if (!model.resolveTask(rs.getTaskID()))
 							JOptionPane.showMessageDialog(new JFrame(), 
 									"An unexpected error has occurred. Please contact your system admin.", "Error", 
 									JOptionPane.ERROR_MESSAGE);

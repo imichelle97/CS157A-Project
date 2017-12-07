@@ -1,18 +1,18 @@
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.Calendar;
 
-import java.util.GregorianCalendar;
-
-import javax.swing.event.ChangeListener;
 /*
  * This class is where the functional methods will be
  */
@@ -26,38 +26,22 @@ public class hotelModel {
 	private Account currentUser;
 	private String currentRole;	//Either customer, manager, or attendant
 	private ArrayList<Reservation> reservations;
-	// JDBC driver name and database URL
-		 final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-		 final String DB_URL = "jdbc:mysql://localhost:3306/hotelDB?autoReconnect=true&useSSL=false";
-		// Database credentials
-			static final String USER = "root";
-			static final String PASS = "";
-			private static ResultSet resultSet = null;
-	//private Connection conn = JDBCUtil.getConnectionByDriverManager();
-		private Connection	conn ;
-	    private Statement state;// = JDBCUtil.getStatement(conn);
 	
 	
+	private Connection conn = JDBCUtil.getConnectionByDriverManager();
+   private Statement state = JDBCUtil.getStatement(conn);
 	private ArrayList<ChangeListener> listeners;
 	
 	/* 
 	 * Constructor
 	 */
 	public hotelModel() {
-		try {
-			conn = DriverManager.getConnection(DB_URL, USER, PASS);
-			state = conn.createStatement();
-			System.out.println("already connected to ");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		TODAY.clear(Calendar.HOUR);	//The clear method sets calendar field(s) undefined
-		
+		TODAY.clear(Calendar.HOUR);	
 		TODAY.clear(Calendar.MINUTE);
 		TODAY.clear(Calendar.SECOND);
 		TODAY.clear(Calendar.MILLISECOND);
 		
+		listeners = new ArrayList<>();
 		currentUser = null;
 		currentRole = null;
 		reservations = new ArrayList<Reservation>();
@@ -65,7 +49,7 @@ public class hotelModel {
 	
 	public void setCurrentRole(String role) {
 		currentRole = role;
-//		update();
+		update();
 	}
 	
 	public String getCurrentRole() {
@@ -85,7 +69,7 @@ public class hotelModel {
 			currentUser = getUserAccount(username);
 			currentRole = currentUser.getUserRole();
 		}
-//		update();
+		update();
 	}
 	
 	public ArrayList<Reservation> getReservations() {
@@ -97,59 +81,30 @@ public class hotelModel {
 	}
 	
 	public String sqlDate(String date) {
-		return "str_to_date('" + date + "', '%m%d%Y')";
+		
+		return "STR_TO_DATE('"+ date+ "','%m/%d/%Y')";
 	}
-	
-	public void addChangeListener(ChangeListener listener) {
-		listeners.add(listener);
-	}
-	
-//	public void update() {
-//		ChangeEvent event = new ChangeEvent(this);
-//		for(ChangeListener listener : listeners) {
-//			listener.stateChanged(event);
-//		}
-//	}
 	
 	/*
-	 * Add an account to the database  
-	 * changes to run 
+	 * Add an account to the database
 	 */
-	public boolean addAccount(String username, String password, String firstName, String lastName,
-			String userRole, int age, String gender) {
-//		username = username.replace("'", "''");
-//		password = password.replace("'", "''");
-//		firstName = firstName.replace("'", "''");
-//		lastName = lastName.replace("'", "''");
-//		String sql = String.format("INSERT INTO USER(username, password, firstName, lastName, userRole, age, gender" 
-//				+ " VALUES('%s','%s','%s','%s','%s','%s''%s')",
-//				username, password, firstName, lastName, userRole, age, gender);
-//		try {
-//
-//			state.execute(sql);
-//			return true;
-//		}
-//		catch(SQLException e) {
-//			e.printStackTrace();
-//			return false;
-//		}
-		String insertion = "INSERT INTO user(username, firstName, lastName, password, age, gender, userRole) VALUES(?,?,?,?,?,?,?)";
-		PreparedStatement preparedStatement;
+	public boolean addAccount(String username, String password, String firstName, String lastName, String userRole, int age, String gender) {
+		username = username.replace("'", "''");
+		password = password.replace("'", "''");
+		firstName = firstName.replace("'", "''");
+		lastName = lastName.replace("'", "''");
+		String g= gender.equals("Female") ? "F" : "M";
+		String sql = String.format("INSERT INTO user(username, firstName, lastName, password, age, gender, userRole)  VALUES('%s','%s','%s','%s',%d,'%s','%s')",
+				username, firstName, lastName, password, age,g, userRole);
+		System.out.println(username);
+		System.out.println(userRole);
+		System.out.println(age);
+		System.out.println(gender);
 		try {
-			preparedStatement = conn.prepareStatement(insertion);
-		
-		preparedStatement.setString(1, username);
-		preparedStatement.setString(2, firstName);
-		preparedStatement.setString(3, lastName);
-		preparedStatement.setString(4, password);
-		preparedStatement.setInt(5, age);
-		preparedStatement.setString(6, gender);
-		preparedStatement.setString(7, userRole);
-		preparedStatement.addBatch();
-		System.out.println("After processing a batch of user");
-		preparedStatement.executeBatch();
-		return true;} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			state.execute(sql);
+			return true;
+		}
+		catch(SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -157,7 +112,6 @@ public class hotelModel {
 	
 	/*
 	 * Get account information
-	 * running correctly
 	 */
 	public User getAccountInfo(String username) {
 		User user = null;
@@ -178,13 +132,12 @@ public class hotelModel {
 	
 	/*
 	 * Get user's account
-	 * running correctly
 	 */
 	public Account getUserAccount(String username) {
 		Account account = null;
 		String sqlAccount = "SELECT username, firstName, lastName, userRole, age, gender FROM USER where username = '"
 				+username+"'" ;
-		String sqlResult = "SELECT customerName, cancelled, reservationID, ROOM.roomID, "
+		String sqlResult =  "SELECT customerName, cancelled, reservationID, ROOM.roomID, "
 				+ "startDate, endDate, totalNumOfDays, totalCost, costPerNight, roomType FROM ROOM right outer join RESERVATION ON ROOM.roomID = RESERVATION.roomID WHERE customerName = '"
 				+ username + "'";
 		try {
@@ -215,48 +168,37 @@ public class hotelModel {
 	
 	/*
 	 * Change the user's account information/update the account information
-	 * running correctly 
 	 */
 	public boolean changeAccount(String password, String firstName, String lastName, int age, String gender) {
 		String sql = "UPDATE USER SET password = '" + password + "' ," 
-	+ " firstName = '" + firstName 
-	+ "' ,"+ " lastName = '" 
-	+ lastName + "' ,"
-	+" age = " + age +","
-	+ " gender = '" + gender + "'"+ " WHERE username = '" + currentUser.getUsername() + "'";
-		try {
-			state.executeUpdate(sql);
-			return true;
-		}
-		catch(SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
+				+ " firstName = '" + firstName 
+				+ "' ,"+ " lastName = '" 
+				+ lastName + "' ,"
+				+" age = " + age +","
+				+ " gender = '" + gender + "'"+ " WHERE username = '" + currentUser.getUsername() + "'";
+					try {
+						state.executeUpdate(sql);
+						return true;
+					}
+					catch(SQLException e) {
+						e.printStackTrace();
+						return false;
+					}
 	}
 	
 	/*
 	 * Add reservations to the database
-	 * input should in "yyyy-mm-dd" format
-	 * running correctly
 	 */
 	public boolean addReservation(int roomID, String checkIn, String checkOut) {
-//		String sql = String.format("INSERT INTO RESERVATION(roomID, customer, startDate, endDate) "
-//				+ "VALUES('%s','%s','%s','%s')", roomID, currentUser.getUsername(), sqlDate(checkIn),
-//				sqlDate(checkOut));
-	String insertion = "INSERT INTO reservation(roomID, customerName, startDate, endDate) VALUES(?,?,?,?)";
+		String sql = String.format("INSERT INTO RESERVATION(roomID, customerName, startDate, endDate) "
+				+ "VALUES(%d,'%s',%s,%s)", roomID, currentUser.getUsername(), sqlDate(checkIn),
+				sqlDate(checkOut));
 		try {
-			PreparedStatement preparedStatement= conn.prepareStatement(insertion);
-			preparedStatement.setInt(1, roomID);
-			preparedStatement.setString(2, currentUser.getUsername());
-			preparedStatement.setDate(3, java.sql.Date.valueOf(checkIn));
-			preparedStatement.setDate(4, java.sql.Date.valueOf(checkOut));
-			preparedStatement.addBatch();
-			preparedStatement.executeBatch();
-//			state.execute(sql);
-//			setCurrentUser(currentUser.getUsername());
-//			ArrayList<Reservation> reservation = currentUser.getReservation();
-//			reservations.add(reservation.get(reservation.size()-1));
-//			update();
+			state.execute(sql);
+			setCurrentUser(currentUser.getUsername());
+			ArrayList<Reservation> reservation = currentUser.getReservation();
+			reservations.add(reservation.get(reservation.size()-1));
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -267,7 +209,6 @@ public class hotelModel {
 	
 	/*
 	 * Get all reservations in the database
-	 * running correctly
 	 */
 	public ArrayList<Reservation> getAllReservations() {
 		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
@@ -295,7 +236,6 @@ public class hotelModel {
 	
 	/*
 	 * Get specific reservation based on min and max of total cost range
-	 * running correctly
 	 */
 	public ArrayList<Reservation> getReservations(String orderBy, Double min, Double max) {
 		ArrayList<Reservation> reservationList = new ArrayList<Reservation>();
@@ -329,7 +269,7 @@ public class hotelModel {
 		catch(SQLException e) {
 			e.printStackTrace();
 			return null;
-		}				
+		}	
 	}	
 	
 	/*
@@ -339,8 +279,9 @@ public class hotelModel {
 		String sql = "UPDATE reservation SET cancelled = true WHERE reservationID = " + r.getReservationID();
 		try {
 			state.execute(sql);
+			
 			setCurrentUser(currentUser.getUsername());
-//			update();
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -464,8 +405,18 @@ public class hotelModel {
 	 * Delete the user
 	 */
 	public void deleteUser(String username) {
+		// for foriegn key constraint, need delete the query first 
+		String delete = "delete from reservation where customerName = '" + username +"'";
+		String deleteCompliant = "delete from complaint where customer = '" + username + "'";
+		String deleteRating = "delete from ratingFeedback where customer = '" + username + "'";
+		String deleteRoomService = "delete from roomService where username = '"+ username +"'";
 		String sql = "DELETE FROM USER WHERE username = '" + username + "'";
 		try {
+			state.execute(delete);
+			state.execute(deleteCompliant);
+			state.execute(deleteRating);
+			state.execute(deleteRoomService);
+			//state.executeUpdate(delete);
 			state.executeUpdate(sql);
 		}
 		catch(SQLException e) {
@@ -493,8 +444,13 @@ public class hotelModel {
 				+ " OR (" + in + " < RESERVATION.endDate and " + out + " > RESERVATION.endDate))";
 		try {
 			ResultSet rs = state.executeQuery(sql);
+			
+			if(rs== null){
+				return roomList;
+			}
+			
 			while(rs.next()) {
-				roomList.add(new Room(rs.getInt("roomID"), rs.getDouble("totalCostPerNight"), rs.getString("roomType")));
+				roomList.add(new Room(rs.getInt("roomID"), rs.getDouble("costPerNight"), rs.getString("roomType")));
 			}
 			rs.close();
 			return roomList;
@@ -552,7 +508,7 @@ public class hotelModel {
 	 * Get specific complaint based on complaintID
 	 */
 	public Complaint getComplaint(int id) {
-		String sql = "SELECT * FROM complaint WHERE compaintID = " + id;
+		String sql = "SELECT * FROM complaint WHERE complaintID = " + id;
 		Complaint c = null;
 		
 		try {
@@ -581,10 +537,10 @@ public class hotelModel {
 		solution = solution.replace("'", "''");
 		String sql = "UPDATE complaint SET resolvedBy = '" + resolvedBy + 
 				"', solution = '" + solution + 
-				"' where complaint ID = " + id;
+				"' where complaintID = " + id;
 		try {
 			state.execute(sql);
-//			update();
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -636,13 +592,13 @@ public class hotelModel {
 	/*
 	 * Resolve the task based on taskID
 	 */
-	public boolean resolveTask(String string) {
+	public boolean resolveTask(int taskID) {
 		String sql = "UPDATE roomService SET completedBy = '" 
-				+ currentUser.getUsername() + " WHERE taskID = "
-				+ string;
+				+ currentUser.getUsername() + "' WHERE taskID = "
+				+ taskID;
 		try {
 			state.execute(sql);
-//			update();
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -655,11 +611,18 @@ public class hotelModel {
 	 * Update rating
 	 */
 	public void updateRating(String username, int rate) {
-		String sql = "UPDATE rating SET rating = '" + rate + 
-				"WHERE customer = '" + username + "'";
+		String sql = String.format("UPDATE ratingFeedback SET rating = %d WHERE customer = '%s'",rate,username);
 		try {
-			state.executeUpdate(sql);
-//			update();
+			ResultSet zoeken = state.executeQuery("SELECT * FROM ratingFeedback WHERE customer = '" + username + "'");
+		       boolean val = zoeken.next(); //next() returns false if there are no-rows retrieved 
+		        if(val==false){
+		        	String insertion = String.format("INSERT into ratingFeedback (customer, rating) VALUES('%s',%d)",username,rate);
+					state.execute(insertion);
+		         }
+		        else{	
+			state.executeUpdate(sql);}
+			
+			update();
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
@@ -675,7 +638,7 @@ public class hotelModel {
 			CallableStatement call = conn.prepareCall("{call archiveAll(?)}");
 			call.setTimestamp("cutoffDate", ts);
 			call.execute();
-//			update();
+			update();
 			return true;
 		}
 		catch(SQLException e) {
@@ -694,7 +657,7 @@ public class hotelModel {
 		avgAge = "SELECT AVG(age) FROM USER", 
 		avgNumRes = "SELECT AVG(reservationCount) FROM (SELECT COUNT(*) AS reservationCount FROM RESERVATION GROUP BY customerName) counts",
 		avgCost = "SELECT AVG(totalCost) FROM RESERVATION",
-		avgRating = "SELECT AVG(rating) FROM RATING",
+		avgRating = "SELECT AVG(rating) FROM ratingFeedback",
 		result = "";
 		
 		try {
@@ -770,6 +733,17 @@ public class hotelModel {
 		catch (SQLException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+	
+	public void addChangeListener(ChangeListener listener) {
+		listeners.add(listener);
+	}
+	
+	public void update() {
+		ChangeEvent event = new ChangeEvent(this);
+		for(ChangeListener listener : listeners) {
+			listener.stateChanged(event);
 		}
 	}
 }

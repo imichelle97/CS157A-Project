@@ -11,8 +11,8 @@ public class Cell extends JLabel implements ListCellRenderer {
 		setOpaque(true);
 	}
 	
-	public Component getListCellRendererComponent(JList list, Object val, int index, boolean isSelected, boolean cellFocused) {
-		String str = val.toString();
+	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellFocused) {
+		String str = value.toString();
 		setText(str);
 		setBackground(Color.white);
 		
