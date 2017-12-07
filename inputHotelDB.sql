@@ -154,17 +154,17 @@ BEGIN
 		                                totalCost,cancelled,updateOn)
 		SELECT reservationId,roomId,customerName,startDate,endDate,totalNumOfDays,totalCost,cancelled,updateOn
 		FROM reservation
-		WHERE DATE(updatedOn) <= cutoffDate;
+		WHERE DATE(updateOn) <= cutoffDate;
 
 		INSERT INTO roomServiceArchive(taskId,username,task,completedBy,updateOn)
 		SELECT taskId,username,task,completedBy,updateOn
 		FROM roomservice
-		WHERE DATE(updatedOn) <= cutoffDate;
+		WHERE DATE(updateOn) <= cutoffDate;
 
 		INSERT INTO complaintArchive(complaintId,customer,complaint,time,resolvedBy,solution,updateOn)
 		SELECT complaintId,customer,complaint,time,resolvedBy,solution,updateOn
 		FROM complaint
-		WHERE DATE(updatedOn) <= cutoffDate;
+		WHERE DATE(updateOn) <= cutoffDate;
 
 		DELETE FROM RESERVATION WHERE DATE(updateOn) <= cutoffDate;
 		DELETE FROM ROOMSERVICE WHERE DATE(updateOn) <= cutoffDate;
@@ -204,4 +204,3 @@ END IF;
  END;
 //
 delimiter ; 
-
