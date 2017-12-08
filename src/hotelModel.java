@@ -12,6 +12,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 
 /*
  * This class is where the functional methods will be
@@ -190,10 +194,29 @@ public class hotelModel {
 	 * Add reservations to the database
 	 */
 	public boolean addReservation(int roomID, String checkIn, String checkOut) {
-		String sql = String.format("INSERT INTO RESERVATION(roomID, customerName, startDate, endDate) "
-				+ "VALUES(%d,'%s',%s,%s)", roomID, currentUser.getUsername(), sqlDate(checkIn),
-				sqlDate(checkOut));
+		DateFormat formatter = new SimpleDateFormat("MM/dd/yyyy"); 
+		int totalDays= 0;
+		double roomPrice =0;
 		try {
+			Date in = (Date)formatter.parse(checkIn);
+			Date out = (Date)formatter.parse(checkOut);
+			totalDays = (int) ((out.getTime() - in.getTime()) / (1000 * 60 * 60 * 24));	
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String price = String.format("Select * from room where roomID = %d ", roomID);
+		try{
+		ResultSet rs = state.executeQuery(price);
+		if(rs.next()){
+			roomPrice = rs.getDouble("costPerNight");
+		}}
+		catch(SQLException e){
+			}
+		String sql = String.format("INSERT INTO RESERVATION(roomID, customerName, startDate, endDate,totalNumOfDays,totalCost) "
+				+ "VALUES(%d,'%s',%s,%s,%d,%f)", roomID, currentUser.getUsername(), sqlDate(checkIn),
+				sqlDate(checkOut),totalDays, totalDays*roomPrice);
+		try {			
 			state.execute(sql);
 			setCurrentUser(currentUser.getUsername());
 			ArrayList<Reservation> reservation = currentUser.getReservation();
